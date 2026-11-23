@@ -58,3 +58,15 @@ Asumsi dan keputusan yang diambil agent selama pengerjaan.
 37. **Terjemahan**: seluruh teks bawaan Breeze diterjemahkan lewat `lang/id.json` (kunci bahasa Inggris asli); label "Dashboard" menjadi "Dasbor".
 38. **Target ketuk 44px**: komponen tombol, input teks, tautan navigasi, item dropdown, tombol menu HP, dan tautan teks di halaman login/profil diberi `min-h-[44px]`. Menu navigasi dibangun dari satu daftar (`layouts/navigation.blade.php`) untuk tampilan lebar dan HP.
 39. Tes otomatis tetap di Tahap 8; `ExampleTest` disesuaikan (tamu di `/` diarahkan ke `/login`). Dasbor diverifikasi dengan tes sementara (sudah dihapus) di MySQL.
+
+## Tahap 8 (Tes, README, finalisasi)
+
+40. **Tes**: 3 file feature test baru (`ProdukAksesTest`, `PenjualanTest`, `ChatbotTest`) mencakup seluruh skenario PRD bagian 12, ditambah kasus pendukung (jual rugi bernilai negatif, stok 0, log chatbot, ambang dari config, batas 5 hasil, kecocokan persis didahulukan). Tes bawaan Breeze yang masih relevan dipertahankan. Total 59 tes hijau. Tes konkurensi tidak dibuat sesuai PRD bagian 5.
+41. **SQLite untuk tes di Laragon**: `pdo_sqlite` dan `sqlite3` mati di `php.ini` global. `php.ini` tidak diubah; tes dijalankan dengan salinan `php.ini` sementara (di luar repo) yang mengaktifkan kedua ekstensi lewat `PHPRC`. Pengguna lain cukup mengaktifkan ekstensi tersebut, dijelaskan di README.
+42. **Pengecekan "tidak membocorkan harga beli"** dilakukan dengan nilai harga beli yang khas (mis. 8765) lalu memastikan angka itu, keuntungan per unit, dan kata "keuntungan" tidak muncul di respons JSON chatbot, termasuk saat pemilik yang bertanya.
+43. **Jawaban atas Pertanyaan Terbuka (PRD bagian 14)**, semuanya masih memakai default karena belum dikonfirmasi mitra:
+    1. Pengguna chatbot: pemilik dan pekerja; pelanggan publik dimatikan (`CHATBOT_PUBLIC=false`). Mengubah ke `true` cukup lewat `.env`, tanpa perubahan kode.
+    2. Kanal chatbot: web saja. Service dibuat tanpa ketergantungan HTTP agar WhatsApp/Telegram dapat dipasang nanti (di luar ruang lingkup saat ini).
+    3. Pekerja tidak boleh melihat harga beli dan keuntungan (ditegakkan di query, view, dan tes).
+    4. Stok masuk dicatat dengan mengubah stok lewat form ubah produk oleh pemilik; tidak ada fitur barang masuk terpisah.
+44. **Verifikasi Definition of Done**: `php artisan migrate:fresh --seed` berjalan bersih di MySQL 8.4 (2 user, 10 produk); `php artisan test` hijau; tidak ada fitur Out of Scope (tidak ada pengiriman, LLM, integrasi WhatsApp/Telegram, keranjang, ekspor, atau tabel tambahan).

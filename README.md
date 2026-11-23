@@ -1,58 +1,130 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Toko Stok
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi web untuk toko mitra: memusatkan data produk (stok, harga beli, harga jual, keuntungan), mencatat penjualan dengan cepat, dan menyediakan chatbot cek stok otomatis. Antarmuka berbahasa Indonesia dan dirancang mobile-first agar nyaman dipakai dari HP.
 
-## About Laravel
+Proyek tugas kuliah: 3 tabel utama (`produk`, `penjualan`, `log_chatbot`) dan satu alur kerja inti (catat penjualan). Spesifikasi lengkap ada di `PRD.md`, asumsi pengembangan di `DECISIONS.md`.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Fitur
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Login dan dua peran**: `pemilik` dan `pekerja`. Registrasi publik dinonaktifkan; akun berasal dari seeder atau database.
+- **Manajemen produk**: daftar dengan pencarian (`?q=`), paginasi 20, badge "Stok menipis" dan "Habis". Tambah, ubah, hapus hanya untuk pemilik. Produk yang sudah punya penjualan tidak dapat dihapus.
+- **Pencatatan penjualan**: pilih produk (dropdown dengan pencarian ketik), isi jumlah, simpan. Stok berkurang otomatis dalam satu transaksi DB dengan `lockForUpdate`. `total_harga` dan `keuntungan` disimpan sebagai snapshot, sehingga perubahan harga tidak mengubah penjualan lama.
+- **Chatbot cek stok** (`/chatbot`): berbasis aturan, tanpa AI generatif. Logika di `App\Services\ChatbotStokService`, tidak bergantung pada HTTP. Tidak pernah menampilkan harga beli atau keuntungan. Setiap pertanyaan dicatat; log hanya dapat dilihat pemilik.
+- **Dasbor rekap harian**: jumlah transaksi, total penjualan, keuntungan (hanya pemilik), daftar stok menipis, dan pemilih tanggal.
+- **Responsif HP**: layar 360 px tanpa scroll horizontal, tombol minimal 44 px, daftar produk berupa kartu di layar sempit dan tabel di layar lebar.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Hak akses
 
-## Learning Laravel
+| Aksi | pemilik | pekerja |
+|---|---|---|
+| Lihat produk, stok, harga jual | ya | ya |
+| Lihat harga beli dan keuntungan | ya | tidak |
+| Tambah/ubah/hapus produk | ya | tidak |
+| Catat penjualan | ya | ya |
+| Rekap harian | lengkap dengan keuntungan | total penjualan dan jumlah transaksi |
+| Pakai chatbot | ya | ya |
+| Lihat log chatbot | ya | tidak |
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Pelanggan tanpa login dapat memakai chatbot hanya bila `CHATBOT_PUBLIC=true` (default `false`).
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Prasyarat
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+- PHP 8.2 atau lebih baru (dikembangkan dengan 8.3) dengan ekstensi `pdo_mysql`
+- Composer
+- MySQL 8 atau MariaDB 10.6+
+- Node.js dan npm (untuk build Tailwind/Vite)
+- Untuk menjalankan tes: ekstensi PHP `pdo_sqlite` dan `sqlite3` (tes memakai SQLite in-memory)
 
-## Agentic Development
+## Instalasi
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+1. Pasang dependensi:
+
+   ```bash
+   composer install
+   npm install
+   ```
+
+2. Salin konfigurasi dan buat kunci aplikasi:
+
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+3. Buat database kosong di MySQL/MariaDB (collation `utf8mb4_unicode_ci`):
+
+   ```sql
+   CREATE DATABASE toko_stok CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   ```
+
+4. Sesuaikan koneksi di `.env` bila perlu (nilai bawaan `.env.example`):
+
+   ```
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=toko_stok
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
+
+5. Jalankan migrasi dan seeder (membuat 2 akun contoh dan 10 produk contoh):
+
+   ```bash
+   php artisan migrate:fresh --seed
+   ```
+
+6. Build aset frontend:
+
+   ```bash
+   npm run build
+   ```
+
+### Konfigurasi toko (opsional, di `.env`)
+
+| Variabel | Default | Fungsi |
+|---|---|---|
+| `TOKO_STOK_MENIPIS` | `5` | Ambang stok menipis (stok <= nilai ini) |
+| `CHATBOT_PUBLIC` | `false` | `true` agar `/chatbot` dapat dipakai tanpa login |
+
+## Akun contoh
+
+Dibuat oleh `UserSeeder`. **Ganti password sebelum dipakai di produksi.**
+
+| Peran | Email | Password |
+|---|---|---|
+| pemilik | `pemilik@toko.test` | `password` |
+| pekerja | `pekerja@toko.test` | `password` |
+
+## Menjalankan aplikasi
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Buka `http://localhost:8000`. Saat mengembangkan tampilan, jalankan `npm run dev` di terminal lain sebagai pengganti `npm run build`. Di Laragon, aplikasi juga dapat dibuka lewat virtual host otomatis (mis. `http://webstok.test`).
 
-## Contributing
+Untuk membuka dari HP di jaringan yang sama, jalankan `php artisan serve --host=0.0.0.0` lalu akses `http://<IP-komputer>:8000`.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Menjalankan tes
 
-## Code of Conduct
+```bash
+php artisan test
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Tes memakai SQLite in-memory (`phpunit.xml`), tidak menyentuh database MySQL. Bila muncul error `could not find driver`, aktifkan `extension=pdo_sqlite` dan `extension=sqlite3` di `php.ini`.
 
-## Security Vulnerabilities
+Cakupan tes minimum PRD bagian 12: pembatasan akses pekerja (403), penyembunyian harga beli dan keuntungan, snapshot penjualan, penolakan jumlah melebihi stok, perubahan harga tidak mengubah penjualan lama, larangan hapus produk yang punya penjualan, seluruh kondisi balasan chatbot, chatbot tidak membocorkan harga beli, dan akses `/chatbot` sesuai `CHATBOT_PUBLIC`.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Catatan: `lockForUpdate()` tidak berefek di SQLite, sehingga konkurensi penjualan tidak diuji otomatis dan cukup diverifikasi manual di MySQL.
 
-## License
+## Struktur penting
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+| Lokasi | Isi |
+|---|---|
+| `app/Services/ChatbotStokService.php` | Logika chatbot (tanpa ketergantungan HTTP) |
+| `app/Services/PenjualanService.php` | Transaksi penjualan dan pengurangan stok |
+| `app/Http/Middleware/EnsureUserHasRole.php` | Middleware `role:pemilik` |
+| `app/Http/Middleware/EnsureChatbotAccess.php` | Akses chatbot sesuai `CHATBOT_PUBLIC` |
+| `config/toko.php` | Ambang stok menipis dan flag chatbot publik |
+| `tests/Feature/` | Feature test |
