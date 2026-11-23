@@ -55,7 +55,7 @@ Asumsi dan keputusan yang diambil agent selama pengerjaan.
 34. **Keuntungan di dasbor**: `SUM(keuntungan)` hanya ditambahkan ke query dan dikirim ke view bila pengguna `pemilik`; untuk pekerja nilainya tidak pernah dihitung maupun dirender.
 35. **Stok menipis**: semua produk dengan `stok <= config('toko.stok_menipis')` termasuk stok 0, urut stok naik lalu nama, badge "Habis"/"Stok menipis", tautan ke `produk.index?q=nama`.
 36. **Rute `/`** mengarah ke `/dashboard` (login) atau `/login` (tamu). View `welcome` dihapus. Middleware `verified` dihapus dari `/dashboard` (verifikasi email tidak dipakai).
-37. **Terjemahan**: seluruh teks bawaan Breeze diterjemahkan lewat `lang/id.json` (kunci bahasa Inggris asli); label "Dashboard" menjadi "Dasbor".
+37. **Terjemahan**: seluruh teks bawaan Breeze diterjemahkan lewat `lang/id.json` (kunci bahasa Inggris asli); label "Dashboard" tetap "Dashboard" (istilah serapan yang lebih dikenal).
 38. **Target ketuk 44px**: komponen tombol, input teks, tautan navigasi, item dropdown, tombol menu HP, dan tautan teks di halaman login/profil diberi `min-h-[44px]`. Menu navigasi dibangun dari satu daftar (`layouts/navigation.blade.php`) untuk tampilan lebar dan HP.
 39. Tes otomatis tetap di Tahap 8; `ExampleTest` disesuaikan (tamu di `/` diarahkan ke `/login`). Dasbor diverifikasi dengan tes sementara (sudah dihapus) di MySQL.
 

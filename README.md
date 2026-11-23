@@ -10,7 +10,7 @@ Proyek tugas kuliah: 3 tabel utama (`produk`, `penjualan`, `log_chatbot`) dan sa
 - **Manajemen produk**: daftar dengan pencarian (`?q=`), paginasi 20, badge "Stok menipis" dan "Habis". Tambah, ubah, hapus hanya untuk pemilik. Produk yang sudah punya penjualan tidak dapat dihapus.
 - **Pencatatan penjualan**: pilih produk (dropdown dengan pencarian ketik), isi jumlah, simpan. Stok berkurang otomatis dalam satu transaksi DB dengan `lockForUpdate`. `total_harga` dan `keuntungan` disimpan sebagai snapshot, sehingga perubahan harga tidak mengubah penjualan lama.
 - **Chatbot cek stok** (`/chatbot`): berbasis aturan, tanpa AI generatif. Logika di `App\Services\ChatbotStokService`, tidak bergantung pada HTTP. Tidak pernah menampilkan harga beli atau keuntungan. Setiap pertanyaan dicatat; log hanya dapat dilihat pemilik.
-- **Dasbor rekap harian**: jumlah transaksi, total penjualan, keuntungan (hanya pemilik), daftar stok menipis, dan pemilih tanggal.
+- **Dashboard rekap harian**: jumlah transaksi, total penjualan, keuntungan (hanya pemilik), daftar stok menipis, dan pemilih tanggal.
 - **Responsif HP**: layar 360 px tanpa scroll horizontal, tombol minimal 44 px, daftar produk berupa kartu di layar sempit dan tabel di layar lebar.
 
 ### Hak akses

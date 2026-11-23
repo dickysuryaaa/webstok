@@ -1,7 +1,7 @@
 @php
     $pengguna = Auth::user();
     $menu = [
-        ['Dasbor', 'Dasbor', 'dashboard', 'dashboard', 'home'],
+        ['Dashboard', 'Dashboard', 'dashboard', 'dashboard', 'home'],
         ['Penjualan', 'Penjualan', 'penjualan.index', 'penjualan.*', 'cart'],
         ['Produk', 'Produk', 'produk.index', 'produk.*', 'box'],
         ['Chatbot', 'Chatbot', 'chatbot.index', 'chatbot.index', 'chat'],

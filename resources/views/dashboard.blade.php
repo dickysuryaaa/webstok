@@ -11,7 +11,7 @@
     <x-slot name="header">
         <div class="flex flex-wrap items-center justify-between gap-2">
             <div class="min-w-0">
-                <h2 class="font-bold text-xl text-slate-900 leading-tight">Dasbor</h2>
+                <h2 class="font-bold text-xl text-slate-900 leading-tight">Dashboard</h2>
                 <p class="mt-0.5 text-sm text-slate-500">
                     Rekap {{ $adalahHariIni ? 'hari ini, ' : '' }}{{ $tanggal->locale('id')->translatedFormat('l, d F Y') }}
                 </p>
