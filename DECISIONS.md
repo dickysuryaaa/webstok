@@ -37,3 +37,14 @@ Asumsi dan keputusan yang diambil agent selama pengerjaan.
 22. **Hari ini** = `00:00` sampai `23:59:59` zona `Asia/Jakarta`, urut `tanggal_penjualan` lalu `id` menurun. Tanpa paginasi (volume satu hari kecil).
 23. Produk berstok 0 tetap tampil di pilihan (berlabel "Habis") dan ditolak server dengan pesan jelas.
 24. Tes otomatis tetap ditunda ke Tahap 8. Logika diverifikasi manual di MySQL (penjualan valid, jual rugi bernilai negatif, jumlah > stok, stok 0, keuntungan tidak dirender untuk pekerja).
+
+## Tahap 5 (F4 Chatbot Cek Stok)
+
+25. **Service**: `App\Services\ChatbotStokService::jawab()` murni PHP, tanpa Request/HTTP dan tanpa library AI. Pencatatan ke `log_chatbot` dilakukan di dalam service (alur langkah 7), sehingga kanal lain otomatis tercatat. `produk_id` hanya terisi bila hasil pencarian tepat 1 produk; `pertanyaan` dipotong 255 karakter.
+26. **Normalisasi**: tanda baca diganti spasi (bukan dihapus rapat) agar "kopi-susu" menjadi dua kata. Setiap kata kunci dicocokkan dengan `LIKE %kata%` (karakter `%` dan `_` di-escape); urutan: nama persis sama dengan seluruh kata kunci dulu, lalu abjad, maksimal 5.
+27. **Sapaan**: pesan dianggap sapaan bila semua katanya sapaan; kata "selamat" diizinkan sebagai pelengkap ("selamat pagi") agar tidak dicari sebagai produk. Balasan sapaan: "Halo! Saya bisa membantu cek stok barang." + kalimat bantuan berisi contoh.
+28. **Contoh bantuan** diambil dari produk dengan `id` terkecil; bila tabel kosong dipakai teks "nama barang". Service hanya memilih kolom `id, nama_produk, stok, harga_jual`, sehingga `harga_beli` dan keuntungan tidak pernah dimuat.
+29. **Akses**: middleware `chatbot.akses` (`EnsureChatbotAccess`) memeriksa `config('toko.chatbot_public')` saat request. Bila `false` dan belum login: redirect ke login (halaman) atau 401 (JSON). Bila `true`: tamu boleh membuka `/chatbot` dan `POST /chatbot/pesan`, `user_id` log null. Tamu memakai `guest-layout`, pengguna login memakai `app-layout`.
+30. **Pesan kosong** lewat endpoint ditolak validasi (422, "Pesan tidak boleh kosong."); bila service dipanggil langsung dengan pesan kosong, balasannya bantuan format.
+31. **Log chatbot**: `GET /chatbot/log` (`role:pemilik`, pekerja 403), paginasi 20, terbaru di atas. Link "Chatbot" di navigasi untuk semua pengguna login, "Log Chatbot" hanya pemilik.
+32. Tes otomatis tetap di Tahap 8; perilaku diverifikasi dengan tes sementara di database MySQL terpisah (sudah dihapus).

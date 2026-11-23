@@ -21,6 +21,14 @@
                     <x-nav-link :href="route('penjualan.index')" :active="request()->routeIs('penjualan.*')">
                         Penjualan
                     </x-nav-link>
+                    <x-nav-link :href="route('chatbot.index')" :active="request()->routeIs('chatbot.index')">
+                        Chatbot
+                    </x-nav-link>
+                    @if (Auth::user()->isPemilik())
+                        <x-nav-link :href="route('chatbot.log')" :active="request()->routeIs('chatbot.log')">
+                            Log Chatbot
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -82,6 +90,14 @@
             <x-responsive-nav-link :href="route('penjualan.index')" :active="request()->routeIs('penjualan.*')">
                 Penjualan
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('chatbot.index')" :active="request()->routeIs('chatbot.index')">
+                Chatbot
+            </x-responsive-nav-link>
+            @if (Auth::user()->isPemilik())
+                <x-responsive-nav-link :href="route('chatbot.log')" :active="request()->routeIs('chatbot.log')">
+                    Log Chatbot
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->
