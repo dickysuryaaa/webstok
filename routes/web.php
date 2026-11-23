@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PenjualanController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -14,6 +15,9 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/produk', [ProdukController::class, 'index'])->name('produk.index');
+
+    Route::get('/penjualan', [PenjualanController::class, 'index'])->name('penjualan.index');
+    Route::post('/penjualan', [PenjualanController::class, 'store'])->name('penjualan.store');
 
     Route::middleware('role:pemilik')->group(function () {
         Route::get('/produk/create', [ProdukController::class, 'create'])->name('produk.create');

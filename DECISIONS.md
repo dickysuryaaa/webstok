@@ -27,3 +27,13 @@ Asumsi dan keputusan yang diambil agent selama pengerjaan.
 15. **Format rupiah**: helper `App\Support\Rupiah::format()` menghasilkan `Rp 12.500`.
 16. **Pencarian `?q=`**: `LIKE %q%` pada `nama_produk` dengan karakter `%` dan `_` di-escape. Link produk di navigasi ditambahkan; teks UI baru berbahasa Indonesia.
 17. **Tes otomatis** untuk tahap ini belum dibuat; sesuai PRD, tes ditulis di Tahap 8.
+
+## Tahap 4 (F3 Pencatatan Penjualan)
+
+18. **Rute**: `GET /penjualan` (form + daftar hari ini) dan `POST /penjualan`, terbuka untuk `pemilik` dan `pekerja` (hanya middleware `auth`).
+19. **Logika di `App\Services\PenjualanService::catat()`**: `DB::transaction` + `lockForUpdate()` pada baris produk, lalu validasi stok, simpan snapshot `total_harga` dan `keuntungan` (bisa negatif), kurangi stok. Kegagalan dilempar sebagai `ValidationException` berpesan Indonesia (stok habis, jumlah melebihi stok, produk tidak ditemukan).
+20. **Form**: combobox pencarian dengan Alpine.js bawaan Breeze. Daftar produk dikirim ke browser hanya dengan `id, nama, stok, harga_jual` (tanpa `harga_beli`) untuk semua peran. Alur: ketik/pilih produk (1 ketukan), isi jumlah (1 ketukan), Simpan (1 ketukan). Validasi akhir tetap di server; cek `jumlah > stok` di browser hanya petunjuk.
+21. **Kolom `keuntungan`** pada daftar hari ini hanya di-`select` dari DB dan dirender untuk `pemilik`.
+22. **Hari ini** = `00:00` sampai `23:59:59` zona `Asia/Jakarta`, urut `tanggal_penjualan` lalu `id` menurun. Tanpa paginasi (volume satu hari kecil).
+23. Produk berstok 0 tetap tampil di pilihan (berlabel "Habis") dan ditolak server dengan pesan jelas.
+24. Tes otomatis tetap ditunda ke Tahap 8. Logika diverifikasi manual di MySQL (penjualan valid, jual rugi bernilai negatif, jumlah > stok, stok 0, keuntungan tidak dirender untuk pekerja).
