@@ -16,3 +16,14 @@ Asumsi dan keputusan yang diambil agent selama pengerjaan.
    - pekerja: `pekerja@toko.test` / `password`
    Ganti password sebelum produksi.
 9. **File skeleton `CLAUDE.md` dan `AGENTS.md`** dari template Laravel meminta pemasangan Laravel Boost. Tidak dipasang karena tidak diminta PRD dan di luar ruang lingkup.
+
+## Tahap 3 (F2 Manajemen Produk)
+
+10. **Registrasi publik dinonaktifkan**: rute `GET/POST /register`, `RegisteredUserController`, view `auth/register.blade.php`, dan `RegistrationTest` dihapus. Hanya akun dari seeder/database yang dapat login. Link "Register" di `welcome.blade.php` otomatis hilang karena dibungkus `Route::has('register')`.
+11. **Middleware peran**: alias `role` (`EnsureUserHasRole`) di `bootstrap/app.php`; mengembalikan 403 bila peran tidak cocok. Dipakai pada rute create/store/edit/update/destroy produk. Rute `produk.index` terbuka untuk semua pengguna login.
+12. **Pembatasan data pekerja**: untuk pekerja, query produk hanya memilih kolom `id, nama_produk, stok, harga_jual` (`harga_beli` tidak dimuat dari DB), dan view tidak merender kolom harga beli/keuntungan.
+13. **Jual rugi**: `harga_jual < harga_beli` ditolak validasi kecuali checkbox `konfirmasi_rugi` dicentang. Checkbox tidak disimpan ke database.
+14. **Hapus produk**: bila punya `penjualan`, hapus ditolak dengan pesan menyarankan stok 0. (FK `restrictOnDelete` tetap sebagai pengaman di level DB.)
+15. **Format rupiah**: helper `App\Support\Rupiah::format()` menghasilkan `Rp 12.500`.
+16. **Pencarian `?q=`**: `LIKE %q%` pada `nama_produk` dengan karakter `%` dan `_` di-escape. Link produk di navigasi ditambahkan; teks UI baru berbahasa Indonesia.
+17. **Tes otomatis** untuk tahap ini belum dibuat; sesuai PRD, tes ditulis di Tahap 8.
