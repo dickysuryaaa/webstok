@@ -48,3 +48,13 @@ Asumsi dan keputusan yang diambil agent selama pengerjaan.
 30. **Pesan kosong** lewat endpoint ditolak validasi (422, "Pesan tidak boleh kosong."); bila service dipanggil langsung dengan pesan kosong, balasannya bantuan format.
 31. **Log chatbot**: `GET /chatbot/log` (`role:pemilik`, pekerja 403), paginasi 20, terbaru di atas. Link "Chatbot" di navigasi untuk semua pengguna login, "Log Chatbot" hanya pemilik.
 32. Tes otomatis tetap di Tahap 8; perilaku diverifikasi dengan tes sementara di database MySQL terpisah (sudah dihapus).
+
+## Tahap 6 dan 7 (F5 Rekap, F6 Responsif)
+
+33. **Dasbor** `GET /dashboard` (`DashboardController`): rekap per tanggal `?tanggal=Y-m-d` (default hari ini, `Asia/Jakarta`; format salah ditolak dengan pesan validasi). Input date dibatasi `max` hari ini di browser, tetapi server tetap menerima tanggal lampau mana pun.
+34. **Keuntungan di dasbor**: `SUM(keuntungan)` hanya ditambahkan ke query dan dikirim ke view bila pengguna `pemilik`; untuk pekerja nilainya tidak pernah dihitung maupun dirender.
+35. **Stok menipis**: semua produk dengan `stok <= config('toko.stok_menipis')` termasuk stok 0, urut stok naik lalu nama, badge "Habis"/"Stok menipis", tautan ke `produk.index?q=nama`.
+36. **Rute `/`** mengarah ke `/dashboard` (login) atau `/login` (tamu). View `welcome` dihapus. Middleware `verified` dihapus dari `/dashboard` (verifikasi email tidak dipakai).
+37. **Terjemahan**: seluruh teks bawaan Breeze diterjemahkan lewat `lang/id.json` (kunci bahasa Inggris asli); label "Dashboard" menjadi "Dasbor".
+38. **Target ketuk 44px**: komponen tombol, input teks, tautan navigasi, item dropdown, tombol menu HP, dan tautan teks di halaman login/profil diberi `min-h-[44px]`. Menu navigasi dibangun dari satu daftar (`layouts/navigation.blade.php`) untuk tampilan lebar dan HP.
+39. Tes otomatis tetap di Tahap 8; `ExampleTest` disesuaikan (tamu di `/` diarahkan ke `/login`). Dasbor diverifikasi dengan tes sementara (sudah dihapus) di MySQL.
