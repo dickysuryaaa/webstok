@@ -70,3 +70,12 @@ Asumsi dan keputusan yang diambil agent selama pengerjaan.
     3. Pekerja tidak boleh melihat harga beli dan keuntungan (ditegakkan di query, view, dan tes).
     4. Stok masuk dicatat dengan mengubah stok lewat form ubah produk oleh pemilik; tidak ada fitur barang masuk terpisah.
 44. **Verifikasi Definition of Done**: `php artisan migrate:fresh --seed` berjalan bersih di MySQL 8.4 (2 user, 10 produk); `php artisan test` hijau; tidak ada fitur Out of Scope (tidak ada pengiriman, LLM, integrasi WhatsApp/Telegram, keranjang, ekspor, atau tabel tambahan).
+
+## Pembaruan UI/UX
+
+45. **Sistem desain**: palet slate (latar), emerald (aksi utama/aman), amber (stok menipis), rose (habis/peringatan); kartu `bg-white border border-slate-200/80 shadow-sm rounded-xl`; angka stok dan rupiah memakai `tabular-nums`. Ikon SVG inline lewat komponen `x-icon`, tanpa library tambahan.
+46. **Navigasi**: menu atas untuk layar `md` ke atas, bilah navigasi bawah untuk HP (Log Chatbot hanya untuk pemilik). Menu hamburger dihapus; profil dan keluar ada di dropdown pengguna yang juga menampilkan badge peran.
+47. **Toast**: pesan `session('status')`, `session('success')`, dan `session('error')` ditampilkan sebagai toast (hilang otomatis 4 detik). Kunci sesi di controller tidak diubah. Status bawaan Breeze (`profile-updated`, dst.) tidak ditoast karena halaman profil sudah menampilkannya.
+48. **Filter status produk**: parameter `?status=menipis` (1 sampai ambang) dan `?status=habis` (0) ditambahkan ke daftar produk, digabung dengan `?q=`. Ini penyaring tampilan atas badge yang sudah ada di F2, bukan fitur baru.
+49. **Hapus produk**: dialog `confirm()` diganti modal Alpine; proteksi backend (produk dengan penjualan tidak bisa dihapus) tidak berubah.
+50. **Chatbot**: tombol pertanyaan cepat memakai satu nama produk pertama (urut abjad) dari database; hanya nama yang dikirim ke view, tanpa harga beli.

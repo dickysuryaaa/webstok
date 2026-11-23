@@ -48,6 +48,8 @@ class DashboardController extends Controller
         return view('dashboard', [
             'tanggal' => $tanggal,
             'hariIni' => $hariIni,
+            'kemarin' => $hariIni->copy()->subDay(),
+            'ambang' => $ambang,
             'adalahHariIni' => $tanggal->isSameDay($hariIni),
             'transaksi' => (int) $rekap->transaksi,
             'total' => (int) $rekap->total,

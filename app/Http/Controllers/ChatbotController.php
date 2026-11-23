@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\LogChatbot;
+use App\Models\Produk;
 use App\Services\ChatbotStokService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -12,7 +13,10 @@ class ChatbotController extends Controller
 {
     public function index(): View
     {
-        return view('chatbot.index');
+        // Contoh nama produk untuk tombol pertanyaan cepat (hanya nama, tanpa harga).
+        $contoh = Produk::query()->orderBy('nama_produk')->value('nama_produk');
+
+        return view('chatbot.index', ['contoh' => $contoh]);
     }
 
     public function pesan(Request $request, ChatbotStokService $chatbot): JsonResponse

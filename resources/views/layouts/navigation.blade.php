@@ -1,99 +1,92 @@
 @php
+    $pengguna = Auth::user();
     $menu = [
-        ['Dasbor', 'dashboard', 'dashboard'],
-        ['Penjualan', 'penjualan.index', 'penjualan.*'],
-        ['Produk', 'produk.index', 'produk.*'],
-        ['Chatbot', 'chatbot.index', 'chatbot.index'],
+        ['Dasbor', 'Dasbor', 'dashboard', 'dashboard', 'home'],
+        ['Penjualan', 'Penjualan', 'penjualan.index', 'penjualan.*', 'cart'],
+        ['Produk', 'Produk', 'produk.index', 'produk.*', 'box'],
+        ['Chatbot', 'Chatbot', 'chatbot.index', 'chatbot.index', 'chat'],
     ];
-    if (Auth::user()->isPemilik()) {
-        $menu[] = ['Log Chatbot', 'chatbot.log', 'chatbot.log'];
+    if ($pengguna->isPemilik()) {
+        $menu[] = ['Log Chatbot', 'Log', 'chatbot.log', 'chatbot.log', 'list'];
     }
 @endphp
 
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+{{-- Bilah atas --}}
+<nav class="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-200/80">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex min-w-0">
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}" class="inline-flex items-center justify-center min-h-[44px] min-w-[44px]" aria-label="Beranda">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
-                    </a>
-                </div>
+        <div class="flex items-center justify-between gap-3 h-16">
+            <div class="flex items-center gap-6 min-w-0">
+                <a href="{{ route('dashboard') }}" class="flex items-center gap-2 min-h-[44px] min-w-0" aria-label="Beranda">
+                    <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-600 text-white shadow-sm">
+                        <x-application-logo class="h-5 w-5 fill-current" />
+                    </span>
+                    <span class="hidden sm:block truncate font-bold text-slate-800">{{ config('app.name', 'Laravel') }}</span>
+                </a>
 
                 {{-- Menu layar lebar --}}
-                <div class="hidden space-x-6 sm:-my-px sm:ms-6 sm:flex">
-                    @foreach ($menu as [$label, $rute, $aktif])
-                        <x-nav-link :href="route($rute)" :active="request()->routeIs($aktif)">{{ $label }}</x-nav-link>
+                <div class="hidden md:flex items-center gap-1">
+                    @foreach ($menu as [$label, $pendek, $rute, $aktif, $ikon])
+                        @php $sedang = request()->routeIs($aktif); @endphp
+                        <a href="{{ route($rute) }}" @if ($sedang) aria-current="page" @endif
+                           class="inline-flex items-center gap-2 min-h-[44px] px-3 rounded-lg text-sm font-medium transition {{ $sedang ? 'bg-emerald-50 text-emerald-700' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' }}">
+                            <x-icon :name="$ikon" class="h-5 w-5" />
+                            {{ $label }}
+                        </a>
                     @endforeach
                 </div>
             </div>
 
-            {{-- Menu pengguna layar lebar --}}
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="inline-flex items-center min-h-[44px] px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()->name }}</div>
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </div>
-                        </button>
-                    </x-slot>
+            {{-- Profil dan peran --}}
+            <x-dropdown align="right" width="w-56">
+                <x-slot name="trigger">
+                    <button type="button" class="flex items-center gap-2 min-h-[44px] max-w-[11rem] sm:max-w-xs ps-1 pe-2 rounded-lg text-sm text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 font-semibold text-slate-600">
+                            {{ mb_strtoupper(mb_substr($pengguna->name, 0, 1)) }}
+                        </span>
+                        <span class="hidden sm:block truncate font-medium">{{ $pengguna->name }}</span>
+                        <x-role-badge :pemilik="$pengguna->isPemilik()" />
+                        <x-icon name="chevron-down" class="h-4 w-4 text-slate-400" />
+                    </button>
+                </x-slot>
 
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">{{ __('Profile') }}</x-dropdown-link>
+                <x-slot name="content">
+                    <div class="px-4 py-3 border-b border-slate-100">
+                        <div class="font-medium text-slate-800 break-words">{{ $pengguna->name }}</div>
+                        <div class="text-xs text-slate-500 break-all">{{ $pengguna->email }}</div>
+                    </div>
+                    <x-dropdown-link :href="route('profile.edit')">
+                        <x-icon name="user" class="h-4 w-4 text-slate-400" /> {{ __('Profile') }}
+                    </x-dropdown-link>
 
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault(); this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
-                        </form>
-                    </x-slot>
-                </x-dropdown>
-            </div>
-
-            {{-- Tombol menu HP --}}
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" type="button" aria-label="Menu"
-                        class="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out">
-                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <x-dropdown-link :href="route('logout')" class="text-rose-600"
+                                onclick="event.preventDefault(); this.closest('form').submit();">
+                            <x-icon name="logout" class="h-4 w-4" /> {{ __('Log Out') }}
+                        </x-dropdown-link>
+                    </form>
+                </x-slot>
+            </x-dropdown>
         </div>
     </div>
+</nav>
 
-    {{-- Menu HP --}}
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
-        <div class="pt-2 pb-3 space-y-1">
-            @foreach ($menu as [$label, $rute, $aktif])
-                <x-responsive-nav-link :href="route($rute)" :active="request()->routeIs($aktif)">{{ $label }}</x-responsive-nav-link>
-            @endforeach
-        </div>
-
-        <div class="pt-4 pb-1 border-t border-gray-200">
-            <div class="px-4">
-                <div class="font-medium text-base text-gray-800 break-words">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gray-500 break-all">{{ Auth::user()->email }}</div>
-            </div>
-
-            <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">{{ __('Profile') }}</x-responsive-nav-link>
-
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault(); this.closest('form').submit();">
-                        {{ __('Log Out') }}
-                    </x-responsive-nav-link>
-                </form>
-            </div>
-        </div>
-    </div>
+{{-- Navigasi bawah khusus HP --}}
+<nav class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur border-t border-slate-200/80 pb-[env(safe-area-inset-bottom)]"
+     aria-label="Navigasi utama">
+    <ul class="grid {{ count($menu) === 5 ? 'grid-cols-5' : 'grid-cols-4' }}">
+        @foreach ($menu as [$label, $pendek, $rute, $aktif, $ikon])
+            @php $sedang = request()->routeIs($aktif); @endphp
+            <li>
+                <a href="{{ route($rute) }}" @if ($sedang) aria-current="page" @endif aria-label="{{ $label }}"
+                   class="relative flex flex-col items-center justify-center gap-0.5 min-h-[56px] px-1 text-[11px] font-medium transition {{ $sedang ? 'text-emerald-600' : 'text-slate-500 active:text-slate-800' }}">
+                    <span class="absolute top-0 h-0.5 w-8 rounded-full {{ $sedang ? 'bg-emerald-600' : 'bg-transparent' }}"></span>
+                    <span class="flex h-7 w-12 items-center justify-center rounded-full {{ $sedang ? 'bg-emerald-50' : '' }}">
+                        <x-icon :name="$ikon" class="h-5 w-5" />
+                    </span>
+                    <span class="truncate max-w-full">{{ $pendek }}</span>
+                </a>
+            </li>
+        @endforeach
+    </ul>
 </nav>

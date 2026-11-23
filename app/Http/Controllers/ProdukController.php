@@ -20,9 +20,19 @@ class ProdukController extends Controller
             ? ['id', 'nama_produk', 'stok', 'harga_beli', 'harga_jual']
             : ['id', 'nama_produk', 'stok', 'harga_jual'];
 
+        $ambang = (int) config('toko.stok_menipis', 5);
+
+        // Filter cepat status stok: semua (default), menipis (1..ambang), habis (0).
+        $status = (string) $request->query('status', '');
+        if (! in_array($status, ['menipis', 'habis'], true)) {
+            $status = '';
+        }
+
         $produk = Produk::query()
             ->select($kolom)
             ->when($q !== '', fn ($query) => $query->where('nama_produk', 'like', '%'.addcslashes($q, '%_\\').'%'))
+            ->when($status === 'menipis', fn ($query) => $query->whereBetween('stok', [1, $ambang]))
+            ->when($status === 'habis', fn ($query) => $query->where('stok', 0))
             ->orderBy('nama_produk')
             ->paginate(20)
             ->withQueryString();
@@ -30,8 +40,9 @@ class ProdukController extends Controller
         return view('produk.index', [
             'produk' => $produk,
             'q' => $q,
+            'status' => $status,
             'pemilik' => $pemilik,
-            'ambang' => (int) config('toko.stok_menipis', 5),
+            'ambang' => $ambang,
         ]);
     }
 
