@@ -60,11 +60,12 @@ class PenjualanController extends Controller
             (int) $request->validated('jumlah'),
         );
 
-        $nama = Produk::query()->whereKey($penjualan->produk_id)->value('nama_produk');
+        $produk = Produk::query()->select(['id', 'nama_produk', 'stok'])->find($penjualan->produk_id);
 
         return redirect()->route('penjualan.index')->with(
             'status',
-            'Penjualan tercatat: '.$nama.' x '.$penjualan->jumlah.' = '.Rupiah::format($penjualan->total_harga).'.'
+            'Penjualan tercatat: '.$produk->nama_produk.' x '.$penjualan->jumlah
+                .' = '.Rupiah::format($penjualan->total_harga).'. Sisa stok: '.$produk->stok.' unit.'
         );
     }
 }

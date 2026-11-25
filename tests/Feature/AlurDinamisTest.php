@@ -77,4 +77,16 @@ class AlurDinamisTest extends TestCase
             ->assertSessionHas('error', fn ($m) => str_contains($m, 'stok menjadi 0'));
         $this->assertDatabaseHas('produk', ['id' => $produk->id]);
     }
+
+    public function test_pesan_sukses_memuat_sisa_stok_dan_dasbor_punya_tombol_catat(): void
+    {
+        $pekerja = User::factory()->create();
+        $produk = Produk::factory()->create(['nama_produk' => 'Barang Sisa', 'stok' => 10]);
+
+        $this->actingAs($pekerja)->post(route('penjualan.store'), ['produk_id' => $produk->id, 'jumlah' => 4])
+            ->assertSessionHas('status', fn ($m) => str_contains($m, 'Barang Sisa') && str_contains($m, 'Sisa stok: 6 unit'));
+
+        $this->actingAs($pekerja)->get(route('dashboard'))->assertSee('Catat Penjualan')->assertSee(route('penjualan.index'));
+        $this->actingAs($pekerja)->get(route('penjualan.index'))->assertDontSee('Keuntungan');
+    }
 }

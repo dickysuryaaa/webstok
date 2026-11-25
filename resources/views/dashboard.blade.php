@@ -16,6 +16,11 @@
                     Rekap {{ $adalahHariIni ? 'hari ini, ' : '' }}{{ $tanggal->locale('id')->translatedFormat('l, d F Y') }}
                 </p>
             </div>
+            <a href="{{ route('penjualan.index') }}"
+               class="inline-flex shrink-0 items-center justify-center gap-1.5 min-h-[44px] px-4 rounded-lg bg-emerald-600 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700">
+                <x-icon name="plus" class="h-5 w-5" />
+                Catat Penjualan
+            </a>
         </div>
     </x-slot>
 
