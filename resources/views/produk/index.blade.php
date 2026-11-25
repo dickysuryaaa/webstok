@@ -151,8 +151,8 @@
                                             <td class="px-4 py-2">
                                                 <div class="flex justify-end gap-1">
                                                     <a href="{{ route('produk.edit', $p) }}" title="Ubah" aria-label="Ubah {{ $p->nama_produk }}"
-                                                       class="inline-flex h-11 w-11 items-center justify-center rounded-lg text-slate-500 hover:bg-emerald-50 hover:text-emerald-700">
-                                                        <x-icon name="pencil" />
+                                                       class="inline-flex h-11 items-center justify-center gap-1.5 px-3 rounded-lg text-sm font-semibold text-emerald-700 hover:bg-emerald-50">
+                                                        <x-icon name="pencil" class="h-4 w-4" /> Ubah
                                                     </a>
                                                     <button type="button" title="Hapus" aria-label="Hapus {{ $p->nama_produk }}"
                                                             @click="konfirmasi(@js(route('produk.destroy', $p)), @js($p->nama_produk))"
