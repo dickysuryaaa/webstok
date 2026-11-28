@@ -21,9 +21,16 @@ class User extends Authenticatable
 
     public const ROLE_PEKERJA = 'pekerja';
 
+    public const ROLE_PELANGGAN = 'pelanggan';
+
     public function isPemilik(): bool
     {
         return $this->role === self::ROLE_PEMILIK;
+    }
+
+    public function isPelanggan(): bool
+    {
+        return $this->role === self::ROLE_PELANGGAN;
     }
 
     /**

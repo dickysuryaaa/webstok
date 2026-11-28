@@ -44,4 +44,11 @@
             </x-primary-button>
         </div>
     </form>
+
+    <div class="mt-5 text-center">
+        <a href="{{ route('home') }}"
+        class="text-sm text-slate-500 hover:text-emerald-600">
+            Kembali ke halaman utama
+        </a>
+    </div>
 </x-guest-layout>

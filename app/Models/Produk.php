@@ -15,7 +15,7 @@ class Produk extends Model
 
     protected $table = 'produk';
 
-    protected $fillable = ['nama_produk', 'stok', 'harga_beli', 'harga_jual'];
+    protected $fillable = ['nama_produk', 'stok', 'harga_beli', 'harga_jual', 'gambar'];
 
     protected function casts(): array
     {
@@ -23,6 +23,7 @@ class Produk extends Model
             'stok' => 'integer',
             'harga_beli' => 'integer',
             'harga_jual' => 'integer',
+            'gambar' => 'string',
         ];
     }
 

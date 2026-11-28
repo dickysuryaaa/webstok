@@ -100,6 +100,10 @@
                                         </div>
                                     @endif
                                 </dl>
+                                <a href="{{ route('produk.gambar.edit', $p) }}"
+                                    class="mt-3 inline-flex items-center justify-center min-h-[40px] px-3 rounded-lg border border-slate-300 text-sm  font-medium text-slate-700 hover:bg-slate-50">
+                                    Kelola Gambar
+                                </a>
                                 @if ($pemilik)
                                     <div class="mt-3 grid grid-cols-2 gap-2">
                                         <a href="{{ route('produk.edit', $p) }}"
@@ -139,7 +143,16 @@
                             <tbody class="divide-y divide-slate-100">
                                 @foreach ($produk as $p)
                                     <tr class="hover:bg-slate-50/70 transition-colors">
-                                        <td class="px-4 py-3 font-medium text-slate-900">{{ $p->nama_produk }}</td>
+                                        <td class="px-4 py-3">
+                                            <div class="font-medium text-slate-900">
+                                                {{ $p->nama_produk }}
+                                            </div>
+
+                                            <a href="{{ route('produk.gambar.edit', $p) }}"
+                                                class="mt-1 inline-block text-xs font-medium text-emerald-700 hover:text-emerald-800">
+                                                Kelola Gambar
+                                            </a>
+                                        </td>
                                         <td class="px-4 py-3 text-right tabular-nums font-semibold {{ $p->stok === 0 ? 'text-rose-600' : ($p->stok <= $ambang ? 'text-amber-700' : 'text-slate-900') }}">{{ $p->stok }}</td>
                                         <td class="px-4 py-3"><x-stok-badge :stok="$p->stok" :ambang="$ambang" /></td>
                                         @if ($pemilik)

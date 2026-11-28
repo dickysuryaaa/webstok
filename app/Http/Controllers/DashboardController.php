@@ -12,6 +12,73 @@ class DashboardController extends Controller
 {
     public function index(Request $request): View
     {
+    if ($request->user()->isPelanggan()) {
+
+        // Mengambil kata pencarian.
+        $search = trim($request->query('search', ''));
+
+        // Mengambil filter stok.
+        $filter = $request->query('filter', 'all');
+
+        if (!in_array($filter, ['all', 'tersedia', 'hampir_habis', 'habis'], true)) {
+            $filter = 'all';
+        }
+
+        $ambang = (int) config('toko.stok_menipis', 5);
+
+        // Mengatur jumlah produk per halaman.
+        $perPage = (int) $request->query('per_page', 9);
+
+        $allowedPerPage = [6, 9, 12, 15];
+
+        if (!in_array($perPage, $allowedPerPage, true)) {
+            $perPage = 9;
+        }
+
+        // Mengambil data produk.
+        $produkQuery = Produk::query()
+            ->select([
+                'id',
+                'nama_produk',
+                'harga_jual',
+                'stok',
+                'gambar',
+            ]);
+
+        // Pencarian berdasarkan nama produk.
+        if ($search !== '') {
+            $produkQuery->where(
+                'nama_produk',
+                'like',
+                '%' . $search . '%'
+            );
+        }
+
+        // Filter berdasarkan status stok.
+        if ($filter === 'tersedia') {
+            $produkQuery->where('stok', '>', $ambang);
+        } elseif ($filter === 'hampir_habis') {
+            $produkQuery->where('stok', '>', 0)
+                ->where('stok', '<=', $ambang);
+        } elseif ($filter === 'habis') {
+            $produkQuery->where('stok', 0);
+        }
+
+        // Pagination.
+        $produk = $produkQuery
+            ->orderBy('nama_produk')
+            ->paginate($perPage)
+            ->withQueryString();
+
+        // Mengirim seluruh variabel ke dashboard pelanggan.
+        return view('auth.pelanggan.dashboard', [
+            'produk' => $produk,
+            'search' => $search,
+            'filter' => $filter,
+            'perPage' => $perPage,
+        ]);
+    }
+
         $request->validate([
             'tanggal' => ['nullable', 'date_format:Y-m-d'],
         ], [

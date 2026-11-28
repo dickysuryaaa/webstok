@@ -7,6 +7,8 @@ use App\Models\Produk;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use App\Http\Requests\ProdukGambarRequest;
+use Illuminate\Support\Facades\Storage;
 
 class ProdukController extends Controller
 {
@@ -82,5 +84,38 @@ class ProdukController extends Controller
         $produk->delete();
 
         return redirect()->route('produk.index')->with('status', 'Produk berhasil dihapus.');
+    }
+
+    public function editGambar(Produk $produk): View
+    {
+        return view('produk.gambar', [
+            'produk' => $produk,
+        ]);
+    }
+
+    /**
+     * Menyimpan atau mengganti gambar produk.
+     */
+    public function updateGambar(
+        ProdukGambarRequest $request,
+        Produk $produk
+    ): RedirectResponse {
+
+        $gambarBaru = $request->file('gambar')
+            ->store('produk', 'public');
+
+        // Menghapus gambar lama jika tersedia.
+        if ($produk->gambar) {
+            Storage::disk('public')->delete($produk->gambar);
+        }
+
+        // Memperbarui lokasi gambar di database.
+        $produk->update([
+            'gambar' => $gambarBaru,
+        ]);
+
+        return redirect()
+            ->route('produk.index')
+            ->with('status', 'Gambar produk berhasil diperbarui.');
     }
 }

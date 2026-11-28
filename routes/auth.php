@@ -9,12 +9,28 @@ use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\PelangganSessionController;
 
 Route::middleware('guest')->group(function () {
+
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
+
+    Route::get('pelanggan/login', [PelangganSessionController::class, 'create'])
+        ->name('pelanggan.login');
+
+    Route::post('pelanggan/login', [PelangganSessionController::class, 'store'])
+        ->middleware('throttle:6,1');
+
+    Route::get('pelanggan/register', [RegisteredUserController::class, 'create'])
+        ->name('pelanggan.register');
+
+    Route::post('pelanggan/register', [RegisteredUserController::class, 'store'])
+        ->name('pelanggan.register.store')
+        ->middleware('throttle:6,1');
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');

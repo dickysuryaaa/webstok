@@ -1,11 +1,19 @@
 @php
     $pengguna = Auth::user();
+
+    // Menu dasar untuk pelanggan.
     $menu = [
         ['Dashboard', 'Dashboard', 'dashboard', 'dashboard', 'home'],
-        ['Penjualan', 'Penjualan', 'penjualan.index', 'penjualan.*', 'cart'],
-        ['Produk', 'Produk', 'produk.index', 'produk.*', 'box'],
-        ['Chatbot', 'Chatbot', 'chatbot.index', 'chatbot.index', 'chat'],
     ];
+
+    // Menu tambahan untuk pemilik dan pekerja.
+    if (!$pengguna->isPelanggan()) {
+        $menu[] = ['Penjualan', 'Penjualan', 'penjualan.index', 'penjualan.*', 'cart'];
+        $menu[] = ['Produk', 'Produk', 'produk.index', 'produk.*', 'box'];
+        $menu[] = ['Chatbot', 'Chatbot', 'chatbot.index', 'chatbot.index', 'chat'];
+    }
+
+    // Menu tambahan khusus pemilik.
     if ($pengguna->isPemilik()) {
         $menu[] = ['Log Chatbot', 'Log', 'chatbot.log', 'chatbot.log', 'list'];
     }
@@ -44,7 +52,10 @@
                             {{ mb_strtoupper(mb_substr($pengguna->name, 0, 1)) }}
                         </span>
                         <span class="hidden sm:block truncate font-medium">{{ $pengguna->name }}</span>
-                        <x-role-badge :pemilik="$pengguna->isPemilik()" />
+                        <x-role-badge
+                        :pemilik="$pengguna->isPemilik()"
+                        :pelanggan="$pengguna->isPelanggan()"
+                        />
                         <x-icon name="chevron-down" class="h-4 w-4 text-slate-400" />
                     </button>
                 </x-slot>
@@ -74,7 +85,7 @@
 {{-- Navigasi bawah khusus HP --}}
 <nav class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur border-t border-slate-200/80 pb-[env(safe-area-inset-bottom)]"
      aria-label="Navigasi utama">
-    <ul class="grid {{ count($menu) === 5 ? 'grid-cols-5' : 'grid-cols-4' }}">
+    <ul class="grid {{ count($menu) === 5 ? 'grid-cols-5' : (count($menu) === 1 ? 'grid-cols-1' : 'grid-cols-4') }}">
         @foreach ($menu as [$label, $pendek, $rute, $aktif, $ikon])
             @php $sedang = request()->routeIs($aktif); @endphp
             <li>
